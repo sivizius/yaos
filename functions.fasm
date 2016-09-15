@@ -1,0 +1,29 @@
+macro _val2hex val, dest
+{
+  pushd  @f
+  pushd  val
+  pushd  dest
+  jmp    strings.val2hex
+  @@:
+}
+macro _console.putChr chr
+{
+  pushd   @f
+  pushw   chr
+  jmp     debug.char
+  @@:
+}
+macro _console.putStr string
+{
+  pushd   @f
+  pushd   string
+  jmp     debug.string
+  @@:
+}
+macro _console.binWord num
+{
+  pushd @f
+  pushd num
+  jmp   debug.value
+  @@:
+}

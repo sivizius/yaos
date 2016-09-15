@@ -1,0 +1,89 @@
+macro ata_init dev
+{
+  if dev in <1,2,3,4>
+    mov                       bx,                           '_'
+    recvByte                  P_ata1_State1
+    ;fail if device not floating
+      cmp                     al,                           0xff
+      jz                      .ata#dev
+    ;then
+      ;fail if check LBA_H != ok
+        sendByte              P_ata#dev#_LBA_H,             0x03
+        recvByte              P_ata#dev#_LBA_H
+        cmp                   al,                           0x03
+        jnz                   .ata#dev
+      ;fail if check LBA_M != ok
+        sendByte              P_ata#dev#_LBA_M,             0x10
+        recvByte              P_ata#dev#_LBA_M
+        cmp                   al,                           0x10
+        jnz                   .ata#dev
+      ;fail if check LBA_L != ok
+        sendByte              P_ata#dev#_LBA_L,             0x96
+        recvByte              P_ata#dev#_LBA_L
+        cmp                   al,                           0x96
+        jnz                   .ata#dev
+      ;select drive
+        if dev in <1,2>
+          sendByte            P_ata#dev#_Device,            0xa0
+        else if dev in <3,4>
+          sendByte            P_ata#dev#_Device,            0xb0
+        end if
+      ;set LBA to 0x000000
+        sendByte              P_ata#dev#_LBA_H,             0x00
+        sendByte              P_ata#dev#_LBA_M,             0x00
+        sendByte              P_ata#dev#_LBA_L,             0x00
+      ;send INDENTIFY
+        sendByte              P_ata#dev#_Command,           ata_IdentifyDevice
+      mov                     dx,                           P_ata#dev#_LBA_L
+      in                      al,                           dx
+      shr                     eax,                          0x08
+      mov                     dx,                           P_ata#dev#_LBA_H
+      in                      al,                           dx
+      mov                     ah,                           al
+      mov                     dx,                           P_ata#dev#_LBA_M
+      in                      al,                           dx
+      ;pushw                   ax
+      ;_val2hex                eax,                          ata.hex
+      ;_console.putChr         '0'
+      ;_console.putChr         'x'
+      ;_console.putStr         ata.hex
+      ;popw                    ax
+      ;if device is PATAPI
+        cmp                   ax,                           ata_PATAPI
+        jne                   @f
+      ;then
+        mov                   bl,                           'P'
+        jmp                   .ata#dev
+      ;else if device is SATAPI
+        @@:
+        cmp                   ax,                           ata_SATAPI
+        jne                   @f
+      ;then
+        mov                   bx,                           'S'
+        jmp                   .ata#dev
+      ;else if device is PATA
+        @@:
+        ;cmp                   ax,                           ata_PATA
+        or                    ax,                           ax
+        jne                   @f
+      ;then
+        mov                   bx,                           'p'
+        jmp                   .ata#dev
+      ;else if device is SATA
+        @@:
+        cmp                   ax,                           ata_SATA
+        jne                   @f
+      ;then
+        mov                   bx,                           's'
+        jmp                   .ata#dev
+      ;else
+        @@:
+        mov                   bx,                           '?'
+        jmp                   .ata#dev
+      ;end
+    ;end
+    .ata#dev#:
+      mov                     [ ata.x#dev#.etc ],           bl
+      _console.putChr         bx
+  end if
+}

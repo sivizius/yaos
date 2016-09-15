@@ -1,3 +1,16 @@
 #!/bin/bash
 
-../build/bin/fasm "yaos.fasm" "../build/bin/yaos" 2>&1 | tee "../build/out/yaos.log"
+mkdir "-p" "../build/yaos/"
+mkdir "-p" "../build/yaos/bin/"
+mkdir "-p" "../build/yaos/cfg/"
+mkdir "-p" "../build/yaos/doc/"
+mkdir "-p" "../build/yaos/key/"
+mkdir "-p" "../build/yaos/lib/"
+mkdir "-p" "../build/yaos/out/"
+mkdir "-p" "../build/yaos/res/"
+mkdir "-p" "../build/yaos/src/"
+mkdir "-p" "../build/yaos/tmp/"
+mkdir "-p" "../build/yaos/usr/"
+echo "#!sba:log"                                                      >        "../build/out/yaos.log"
+echo "== compile kernel =="
+  ../build/bin/fasm "yaos.fasm" "../build/yaos/bin/yaos.bin"     2>&1 | tee -a "../build/out/yaos.log"

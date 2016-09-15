@@ -1,0 +1,19 @@
+strings:
+.val2hex:
+  popd                        edi
+  popd                        ebx
+  mov                         cl,                           0x80
+  .val2hexLoop:
+    rol                       ebx,                          0x04
+    mov                       al,                           bl
+    shr                       cl,                           0x01
+    and                       al,                           0x0f
+    cmp                       al,                           0x0a
+    jb                        @f
+    add                       al,                           'a' - 0x0a - '0'
+    @@:
+    add                       al,                           '0'
+    stosb
+    or                        cl,                           cl
+    jnz                       .val2hexLoop
+  ret

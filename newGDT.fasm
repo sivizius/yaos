@@ -1,0 +1,188 @@
+macro newGDTnull off
+{
+  mov   dword [ off + 0x00 ], 0x00000000
+  mov   dword [ off + 0x04 ], 0x00000000
+}
+macro newGDTcode off, size, base, active, mode, conform, read, bit
+{
+  local limit
+  local access
+  access = 0x18
+  if active in <'present','active'>
+    access = access + 0x80
+  else if active in <'save','inactive'>
+  else
+    fehler in newGDTcode: ungültiger wert für 'active'!
+  end if
+  if mode in <0,1,2,3>
+    access = access + ( mode * 0x20 )
+  else if mode eq 'user'
+    access = access + 0x60
+  else if mode eq 'kernel'
+    access = access
+  else
+    <Fehler in newGDTcode: ungültiger Wert für 'mode'!>
+  end if
+  if conform eq 'conform'
+    access = access + 0x04
+  else if conform eq 'default'
+  else
+    <Fehler in newGDTcode: ungültiger Wert für 'conform'!>
+  end if
+  if read eq 'read'
+    access = access + 0x02
+  else if read eq 'save'
+  else
+    <Fehler in newGDTcode: ungültiger Wert für 'read'!>
+  end if
+
+  local flags
+  flags = 0x40
+  if size > 0x000fffff
+    limit = ( size shr 0x0c )
+    flags = flags + 0x80
+  else
+    limit = size
+  end if
+  if bit in <'true','set'>
+    flags = flags + 0x10
+  else if bit in <'false','clr','not'>
+  else
+    <Fehler in newGDTcode: ungültiger Wert für 'bit'!>
+  end if
+
+  mov   word [ off + 0x00 ], ( limit and 0x0000ffff )
+  mov   word [ off + 0x02 ], ( base and 0x0000ffff )
+  mov   byte [ off + 0x04 ], (( base and 0x00ff0000 ) shr 0x10 )
+  mov   byte [ off + 0x05 ], access
+  mov   byte [ off + 0x06 ], ( flags + (( limit and 0x000f0000 ) shr 0x10 ))
+  mov   byte [ off + 0x07 ], (( base and 0xff000000 ) shr 0x18 )
+}
+macro newGDTdata off, size, base, active, mode, direction, write, bit
+{
+  local limit
+  local access
+
+  access = 0x10
+  if active in <'present','active'>
+    access = access + 0x80
+  else if active in <'save','inactive'>
+  else
+    fehler in newGDTdata: ungültiger wert für 'active'!
+  end if
+  if mode in <0,1,2,3>
+    access = access + ( mode * 0x20 )
+  else if mode eq 'user'
+    access = access + 0x60
+  else if mode eq 'kernel'
+    access = access
+  else
+    fehler in newGDTdata: ungültiger wert für 'mode'!
+  end if
+  if direction eq 'down'
+    access = access + 0x04
+  else if direction eq 'up'
+  else
+    fehler in newGDTdata: ungültiger wert für 'direction'!
+  end if
+  if write eq 'write'
+    access = access + 0x02
+  else if write eq 'save'
+  else
+    fehler in newGDTdata: ungültiger wert für 'write'!
+  end if
+
+  local flags
+
+  flags = 0x40
+  if size > 0x000fffff
+    limit = ( size shr 0x0c )
+    flags = flags + 0x80
+  else
+    limit = size
+  end if
+  if bit in <'true','set'>
+    flags = flags + 0x10
+  else if bit in <'false','clr','not'>
+  else
+    fehler in newGDTdata: ungültiger wert für 'bit'!
+  end if
+
+  mov   word [ off + 0x00 ], ( limit and 0x0000ffff )
+  mov   word [ off + 0x02 ], ( base and 0x0000ffff )
+  mov   byte [ off + 0x04 ], (( base and 0x00ff0000 ) shr 0x10 )
+  mov   byte [ off + 0x05 ], access
+  mov   byte [ off + 0x06 ], ( flags + (( limit and 0x000f0000) shr 0x10 ))
+  mov   byte [ off + 0x07 ], (( base and 0xff000000 ) shr 0x18 )
+}
+macro newGDTtss off, size, base, active, mode, bit
+{
+  local limit
+  local access
+
+  access = 0x09
+  if active in <'present','active'>
+    access = access + 0x80
+  else if active in <'save','inactive'>
+  else
+    fehler in newGDTtss: ungültiger wert für 'active'!
+  end if
+  if mode in <0,1,2,3>
+    access = access + ( mode * 0x20 )
+  else if mode eq 'user'
+    access = access + 0x60
+  else if mode eq 'kernel'
+    access = access
+  else
+    fehler in newGDTtss: ungültiger wert für 'mode'!
+  end if
+
+  local flags
+
+  flags = 0x40
+  if size > 0x000fffff
+    limit = ( size shr 0x0c )
+    flags = flags + 0x80
+  else
+    limit = size
+  end if
+  if bit in <'true','set'>
+    flags = flags + 0x10
+  else if bit in <'false','clr','not'>
+  else
+    fehler in newGDTtss: ungültiger wert für 'bit'!
+  end if
+
+  mov   word [ off + 0x00 ], ( limit and 0x0000ffff )
+  mov   word [ off + 0x02 ], ( base and 0x0000ffff )
+  mov   byte [ off + 0x04 ], (( base and 0x00ff0000 ) shr 0x10 )
+  mov   byte [ off + 0x05 ], access
+  mov   byte [ off + 0x06 ], ( flags + (( limit and 0x000f0000 ) shr 0x10 ))
+  mov   byte [ off + 0x07 ], (( base and 0xff000000 ) shr 0x18 )
+}
+macro newIDT base, selector, active, mode, type
+{
+  local flags
+  flags = type
+  if active in <'present','active'>
+    flags = flags + 0x80
+  else if active in <'save','inactive'>
+  else
+    fehler in newIDT: ungültiger wert für 'active'!
+  end if
+  if mode in <0,1,2,3>
+    flags = flags + ( mode * 0x20 )
+  else if mode eq 'user'
+    flags = flags + 0x60
+  else if mode eq 'kernel'
+    flags = flags
+  else
+    fehler in newIDT: ungültiger wert für 'mode'!
+  end if
+
+  dw ( base and 0x0000ffff )
+  dw selector
+  db 0x00
+  db flags
+  dw (( base and 0xffff0000 ) shr 0x10 )
+}

@@ -1,0 +1,16 @@
+F_mbhAlign                                                    = 0x00000001
+F_mbhMemory                                                   = 0x00000002
+F_mbhVideo                                                    = 0x00000004
+F_mbhOS                                                       = 0x00010000
+
+F_mbsMemory                                                   = 0x00000001
+F_mbsDeviceBoot                                               = 0x00000002
+
+F_ataBusy                                                     = 0x80
+F_ataReady                                                    = 0x40
+F_ataFault                                                    = 0x20
+F_ataComplete                                                 = 0x10
+F_ataRequest                                                  = 0x08
+F_ataCorrected                                                = 0x04
+F_ataIndex                                                    = 0x02
+F_ataError                                                    = 0x01

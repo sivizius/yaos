@@ -1,0 +1,56 @@
+mbh_Magic                                                     = 0x1badb002
+mbh_EAX                                                       = 0x2badb002
+mbh_Flags                                                     = F_mbhAlign  ;or F_mbhVideo
+mbh_Check                                                     = - ( mbh_Magic + mbh_Flags )
+
+mbh_Header                                                    = _multiboot
+mbh_Load                                                      = _multiboot
+mbh_LoadEnd                                                   = _stop
+mbh_Bss                                                       = _stack
+mbh_Entry                                                     = _start
+
+mbs_Flags                                                     = 0;F_mbsDeviceBoot
+
+_multiboot:
+  align 0x04
+  mbh:                                                                          ; == MultiBoot Header ==
+    dd mbh_Magic                                                                ; req
+    dd mbh_Flags                                                                ; req
+    dd mbh_Check                                                                ; req
+;    dd mbh_Header                                                               ; os
+;    dd mbh_Load                                                                 ; os
+;    dd mbh_LoadEnd                                                              ; os
+;    dd mbh_Bss                                                                  ; os
+;    dd mbh_Entry                                                                ; os
+;    dd 0x00                                                                     ; mem mbh_Type
+;    dd 0x00                                                                     ; mem mbh_Width
+;    dd 0x00                                                                     ; mem mbh_Height
+;    dd 0x00                                                                     ; mem mbh_Depth
+;  mbs:                                                                          ; == MultiBoot Structure ==
+;    dd mbs_Flags
+;    dd 0x00                                                                     ; mbs_memLow
+;    dd 0x00                                                                     ; mbs_memUp
+;  mbs_DeviceBoot:
+;    db 0x00
+;    db 0x00                                                                     ; mbs_DevicePart
+;    dw 0x00                                                                     ; mbs_DeviceSubPart
+;    dd 0x00                                                                     ; mbs_Cli
+;    dd 0x00                                                                     ; mbs_modCount
+;    dd 0x00                                                                     ; mbs_modAddr
+;   dd 0x00                                                                     ; mbs_Syms0
+;    dd 0x00                                                                     ; mbs_Syms1
+;    dd 0x00                                                                     ; mbs_Syms2
+;    dd 0x00                                                                     ; mbs_Syms3
+;    dd 0x00                                                                     ; mbs_mmapLen
+;    dd 0x00                                                                     ; mbs_mmapAddr
+;    dd 0x00                                                                     ; mbs_driveLen
+;    dd 0x00                                                                     ; mbs_driveAddr
+;    dd 0x00                                                                     ; mbs_cfgTable
+;    dd 0x00                                                                     ; mbs_Name
+;    dd 0x00                                                                     ; mbs_apmTable
+;    dd 0x00                                                                     ; mbs_vbeControl
+;    dd 0x00                                                                     ; mbs_vbeInfo
+;    dw 0x00                                                                     ; mbs_vbeMode
+;    dw 0x00                                                                     ; mbs_vbeintSeg
+;    dw 0x00                                                                     ; mbs_vbeintOff
+;    dw 0x00                                                                     ; mbs_vbeintLen

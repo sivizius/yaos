@@ -1,0 +1,35 @@
+include 'newGDT.fasm'
+
+macro newTask theTask, theFlags, theCode, theStack
+{
+  local thePos
+  thePos                                                      = _tblProcess + ( theTask * 0x08 )
+  mov                         byte  [ thePos ],             theFlags
+  mov                         dword [ thePos + 0x04 ],      ( theStack - 0x02 )
+  mov                         dword [ theStack - 0x02 ],    theCode
+}
+
+macro pit_InitChannel0 mode, freq
+{
+  local counter
+  if mode eq 0x02
+    if freq > 0x13
+      theFreq                                                 = 0x13
+    else
+      theFreq                                                 = freq
+    end if
+    counter                                                   = 1193182 / theFreq
+    sendByte                  P_pit_Init,                   0x34
+    sendWord                  P_pit_Channel0,               counter
+  else
+    <Fehler in pit_InitChannel0: Ungültiger Wert für 'mode'!>
+  end if
+}
+
+macro pic_EndOfIRQ irq
+{
+  sendByte                    P_pic_Master_Command,         0x20
+  if irq > 0x07
+    sendByte                  P_pic_Slave_Command,          0x20
+  end if
+}

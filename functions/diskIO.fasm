@@ -1,0 +1,26 @@
+headerDiskIO headerModule initDiskIO, ( stopDiskIO - initDiskIO ), ( stckDiskIO - stopDiskIO )
+dataDiskIO:
+  .streamDevice1:
+    .streamDevice1.next:
+  .streamDevice2:
+    .streamDevice2.next:
+  .streamDevice3:
+    
+  .streamDevice4:
+initDiskIO:
+  _console.putChr         '['
+  ata_init                1
+  ata_init                2
+  ata_init                3
+  ata_init                4
+  _console.putChr         ']'
+  _console.putChr         0x0a
+openDiskIOstream:
+killDiskIOstream:
+sendDiskIOstream:
+recvDiskIOstream:
+ctrlDiskIOstream:
+
+stopDiskIO:
+;org ( $ + 0x1000 )
+stckDiskIO:

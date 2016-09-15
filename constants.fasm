@@ -1,0 +1,42 @@
+_version                                                        = 0x0910
+
+lenStack                                                        = 0x2000
+
+date                                                            = 0x20140730
+
+void                                                            = 0x00
+
+idt_gTask                                                       = 0x05
+idt_gInterrupt                                                  = 0x0e
+idt_gTrap                                                       = 0x0f
+
+mem_Boot                                                        = 0x07c0
+mem_Video                                                       = 0x000b8000
+mem_Stack                                                       = 0x9c00
+mem_GPE                                                         = 0x1000
+
+pic_ICW1_withICW4                                               = 0x01
+pic_ICW1_noICW3                                                 = 0x02
+pic_ICW1_init                                                   = 0x10
+pic_ICW3_Master                                                 = 0x04
+pic_ICW3_Slave                                                  = 0x02
+pic_ICW4_8086                                                   = 0x01
+pic_readIRR                                                     = 0x0a
+pic_readISR                                                     = 0x0b
+
+irq_Master                                                      = 0x20
+irq_Slave                                                       = 0x28
+
+process_fActive                                                 = 0x80
+process_fNext                                                   = 0x40
+
+ata_IdentifyDevice                                              = 0xec
+ata_PATAPI                                                      = 0xeb14
+ata_SATAPI                                                      = 0x9669
+ata_PATA                                                        = 0x0000
+ata_SATA                                                        = 0xc33c
+
+
+debug.x                                                         = 0x000b8fff
+debug.y                                                         = 0x000b8ffe
+debug.z                                                         = 0x000b8ffa

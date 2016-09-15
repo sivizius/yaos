@@ -1,0 +1,122 @@
+_start:
+  ;if eax != mbh_EAX
+    cmp                       eax,                          mbh_EAX
+  ;then
+    jne                       _error
+  ;else
+    ;update stack
+      mov                     esp,                          0x00009fff
+      mov                     ebp,                          0x00009fff
+    ;create GDT => Page #0002
+      newGDTnull              0x00                                                                        ;
+      _gdt.null                                               = 0x00                                      ;
+      newGDTcode              0x08, 0xffffffff, 0x00000000, 'active', 'kernel', 'default',  'read', 'true';
+      _gdt.kernelCode                                         = 0x08                                      ;
+      newGDTdata              0x10, 0xffffffff, 0x00000000, 'active', 'kernel',      'up', 'write', 'true';
+      _gdt.kernelData                                         = 0x10                                      ;
+      newGDTcode              0x18, 0xffffffff, 0x00000000, 'active',   'user', 'default',  'read', 'true';
+      _gdt.userCode                                           = 0x18                                      ;
+      newGDTdata              0x20, 0xffffffff, 0x00000000, 'active',   'user',      'up', 'write', 'true';
+      _gdt.userData                                           = 0x20                                      ;
+      newGDTtss               0x28, 0xffffffff, 0x00000000, 'active', 'kernel',                     'true';
+      newGDTtss               0x30, 0xffffffff, 0x00000000, 'active', 'kernel',                     'true';
+    ;load GDT...
+      lgdt                    pword [ gdtr ]
+    ;update segments
+      mov                     ax,                           ( _gdt.kernelData )
+      mov                     ds,                           ax
+      mov                     es,                           ax
+      mov                     fs,                           ax
+      mov                     gs,                           ax
+      mov                     ss,                           ax
+    ;far jump
+      jmp                     ( _gdt.kernelCode ):@f
+      @@:
+    ;move IDT => Page #0003, #0004
+      mov                     esi,                          _idt
+      mov                     edi,                          0x00003000
+      mov                     cx,                           0x0200
+      @@:
+        lodsd
+        stosd
+      loop                    @b
+    ;move Interrupts => Page #0005
+      mov                     esi,                          _int
+      mov                     edi,                          0x00005000
+      mov                     ecx,                          ( _tni - _int )
+      @@:
+        lodsb
+        stosb
+      loop                    @b
+    ;config interrupts
+      lidt                    pword [ idtr ]
+      sendByte                P_pic_Master_Command,         ( pic_ICW1_init + pic_ICW1_withICW4 )
+      sendByte                P_pic_Slave_Command,          ( pic_ICW1_init + pic_ICW1_withICW4 )
+      sendByte                P_pic_Master_Data,            irq_Master
+      sendByte                P_pic_Slave_Data,             irq_Slave
+      sendByte                P_pic_Master_Data,            pic_ICW3_Master
+      sendByte                P_pic_Slave_Data,             pic_ICW3_Slave
+      sendByte                P_pic_Master_Data,            pic_ICW4_8086
+      sendByte                P_pic_Slave_Data,             pic_ICW4_8086
+      sendByte                P_pic_Master_IrqMaskReg,      0x00
+      sendByte                P_pic_Slave_IrqMaskReg,       0x00
+    ;use paging
+      ;clear Page-Directory @0x00000000
+        xor                   eax, eax
+        mov                   cx,                           0x0400
+        ;[todo] stosd
+        @@:
+          mov                 dword [ eax ],                0x00000002
+          add                 eax,                          0x04
+        loop                  @b
+      ;new PageDir-Entry #0000
+        mov                   dword [0x00000000],           0x00001003
+      ;new PageTbl Entries
+        mov                   dword [0x00000000],           0x00000003                    ;Page-Directory
+        mov                   dword [0x00000004],           0x00001003                    ;Page-Table #0000
+        mov                   dword [0x00000008],           0x00002003                    ;Global Descriptor Table
+        mov                   dword [0x0000000c],           0x00003003                    ;Interrupt Descriptor Table int 0x00 - 0x7f
+        mov                   dword [0x00000010],           0x00004003                    ;Interrupt Descriptor Table int 0x80 - 0xff
+        mov                   dword [0x00000014],           0x00005001                    ;Interrupts
+        mov                   dword [0x00000020],           0x00008003                    ;MBH, MBS, _start, data
+        mov                   dword [0x00000024],           0x00009003                    ;Core-Stack
+        mov                   dword [0x000002e0],           0x000b8003                    ;Console
+        ;mov                   dword [0x00001080],           0x00010001                    ;process.#00.code
+        ;mov                   dword [0x00001090],           0x00014003                    ;process.#00.data
+        ;mov                   dword [0x000010a0],           0x00018003                    ;process.#00.stck
+        ;mov                   dword [0x000010b0],           0x0001c001                    ;process.#00.rodt
+      ;init console
+        ;remove cursor
+          sendByte            0x03d4,                       0x0e
+          sendByte            0x03d5,                       0x07
+          sendByte            0x03d4,                       0x0f
+          sendByte            0x03d5,                       0xd0
+        ;debug.x = 0xa0
+          mov                 byte  [ debug.x ],            0xa0
+        ;debug.y = 0x19
+          mov                 byte  [ debug.y ],            0x19
+        ;debug.z = 0x000b8000
+          mov                 dword [ debug.z ],            0x000b8000
+      ;enable paging
+        xor                   eax,                          eax
+        mov                   cr3,                          eax
+        mov                   eax,                          cr0
+        or                    eax,                          ( 0x01 shl 0x1f )
+        mov                   cr0,                          eax
+    ;ATA
+    _console.putStr           string.initMultitasking
+    ;init multitasking
+      pit_InitChannel0        0x02,                         0x13
+    _console.putStr           string.YAOS
+    _console.putChr           0x0a
+    ;kernel ready
+      sti
+      int                     0x20
+      jmp                     $
+  ;end
+_error:
+  _console.putStr string.Error
+_final:
+    cli
+    hlt
+    jmp                       _final

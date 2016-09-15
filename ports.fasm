@@ -1,0 +1,121 @@
+P_pic_Master_Command                                          = 0x0020
+P_pic_Master_Data                                             = 0x0021
+P_pic_Master_IrqMaskReg                                       = 0x0021
+
+P_pit_Channel0                                                = 0x0040
+P_pit_Channel1                                                = 0x0041
+P_pit_Channel2                                                = 0x0042
+P_pit_Init                                                    = 0x0043
+
+P_kbc_IOBuffer                                                = 0x0060
+
+P_kbc_State                                                   = 0x0064
+
+P_pic_Slave_Command                                           = 0x00a0
+P_pic_Slave_Data                                              = 0x00a1
+P_pic_Slave_IrqMaskReg                                        = 0x00a1
+
+P_ata4_Data                                                   = 0x0168
+P_ata4_Error                                                  = 0x0169
+P_ata4_Count                                                  = 0x016a
+P_ata4_LBA_L                                                  = 0x016b
+P_ata4_LBA_M                                                  = 0x016c
+P_ata4_LBA_H                                                  = 0x016d
+P_ata4_Device                                                 = 0x016e
+P_ata4_State1                                                 = 0x016f
+P_ata4_Command                                                = 0x016f
+P_ata2_Data                                                   = 0x0170
+P_ata2_Error                                                  = 0x0171
+P_ata2_Count                                                  = 0x0172
+P_ata2_LBA_L                                                  = 0x0173
+P_ata2_LBA_M                                                  = 0x0174
+P_ata2_LBA_H                                                  = 0x0175
+P_ata2_Device                                                 = 0x0176
+P_ata2_State1                                                 = 0x0177
+P_ata2_Command                                                = 0x0177
+
+P_ata3_Data                                                   = 0x01e8
+P_ata3_Error                                                  = 0x01e9
+P_ata3_Count                                                  = 0x01ea
+P_ata3_LBA_L                                                  = 0x01eb
+P_ata3_LBA_M                                                  = 0x01ec
+P_ata3_LBA_H                                                  = 0x01ed
+P_ata3_Device                                                 = 0x01ee
+P_ata3_State1                                                 = 0x01ef
+P_ata3_Command                                                = 0x01ef
+P_ata1_Data                                                   = 0x01f0
+P_ata1_Error                                                  = 0x01f1
+P_ata1_Count                                                  = 0x01f2
+P_ata1_LBA_L                                                  = 0x01f3
+P_ata1_LBA_M                                                  = 0x01f4
+P_ata1_LBA_H                                                  = 0x01f5
+P_ata1_Device                                                 = 0x01f6
+P_ata1_State1                                                 = 0x01f7
+P_ata1_Command                                                = 0x01f7
+
+P_ata4_State2                                                 = 0x036e
+P_ata4_Control                                                = 0x036e
+P_ata2_State2                                                 = 0x0376
+P_ata2_Control                                                = 0x0376
+P_ata3_State2                                                 = 0x03ee
+P_ata3_Control                                                = 0x03ee
+P_ata1_State2                                                 = 0x03f6
+P_ata1_Control                                                = 0x03f6
+
+macro sendByte port, msg
+{
+  mov                         al,                             msg
+  if ( port > 0xff )
+    mov                       dx,                             port
+    out                       dx,                             al
+  else
+    out                       port,                           al
+  end if
+}
+macro sendWord port, msg
+{
+  mov                         ax,                             msg
+  if ( port > 0xff )
+    mov                       dx,                             port
+    out                       dx,                             ax
+  else
+    out                       port,                           ax
+  end if
+}
+macro sendLong port, msg
+{
+  mov                         eax,                            msg
+  if ( port > 0xff )
+    mov                       dx,                             port
+    out                       dx,                             eax
+  else
+    out                       port,                           eax
+  end if
+}
+macro recvByte port
+{
+  if ( port > 0xff )
+    mov                       dx,                             port
+    in                        al,                             dx
+  else
+    in                        al,                             port
+  end if
+}
+macro recvWord port
+{
+  if ( port > 0xff )
+    mov                       dx,                             port
+    in                        ax,                             dx
+  else
+    in                        ax,                             port
+  end if
+}
+macro recvLong port
+{
+  if ( port > 0xff )
+    mov                       dx,                             port
+    in                        eax,                            dx
+  else
+    in                        eax,                            port
+  end if
+}

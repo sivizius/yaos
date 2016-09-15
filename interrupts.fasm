@@ -1,0 +1,94 @@
+_int:
+  org 0x00005000
+  _int.Exceptions:
+  _int.x00:
+    _console.putStr string.ThisIsAnException
+    iret
+  _int.IRQs:
+  _int.x20:                                                     ;== Scheduler ==
+    ;save cpu-state on last stack
+      pushad
+      push  ds
+      push  es
+      push  fs
+      push  gs
+      push  ss
+    ;update segments
+      mov   ax, ( _gdt.kernelData )
+      mov   ds, ax
+      mov   es, ax
+      mov   fs, ax
+      mov   gs, ax
+      mov   ss, ax
+    ;echo  »#«
+      _console.putChr '#'
+    ;get pointer to current process
+      mov   al, [ process.current ]
+    ;load cpu-state of next stack
+      pop   ss
+      pop   gs
+      pop   fs
+      pop   es
+      pop   ds
+      popad
+    ;return to next process
+      pushw ax
+      mov   al, 0x20
+      out   P_pic_Master_Command,                           al
+      popw  ax
+      iret
+  _int.x21:
+    _console.putStr string.ThisIsAnKeyboard
+    pic_EndOfIRQ 0x01
+    iret
+  _int.x22:
+    _console.putStr string.ThisIsAnIRQ
+    pic_EndOfIRQ 0x02
+    iret
+  _int.x27:
+    ;if Spurious Interrupt
+      sendByte P_pic_Master_Command, pic_readISR
+      recvByte P_pic_Master_Command
+      test  al, 0x80
+      jnz   @f
+    ;then
+      _console.putStr string.ThisIsAnSpurious
+      iret
+    ;else
+      @@:
+      _console.putStr string.ThisIsAnIRQ
+      pic_EndOfIRQ 0x07
+      iret
+    ;end
+  _int.x28:
+    _console.putStr string.ThisIsAnIRQ
+    pic_EndOfIRQ 0x08
+    iret
+  _int.x2f:
+    ;if Spurious Interrupt
+      sendByte P_pic_Slave_Command, pic_readISR
+      recvByte P_pic_Slave_Command
+      test  al, 0x80
+      jnz   @f
+    ;then
+      _console.putStr string.ThisIsAnSpurious
+      pic_EndOfIRQ 0x02
+      iret
+    ;else
+      @@:
+      _console.putStr string.ThisIsAnIRQ
+      pic_EndOfIRQ 0x0f
+      iret
+    ;end
+  _int.SysCalls:
+  _int.x30:                                                     ;== sys.page.new() ==
+    _console.putChr 'N'
+    iret
+  _int.x31:                                                     ;== sys.page.del(EAX:Page) ==
+    _console.putChr 'D'
+    iret
+  _int.xff:
+    _console.putStr string.ThisIsAnInterrupt
+    iret
+    org ( $ - 0x00005000 + _int )
+_tni:

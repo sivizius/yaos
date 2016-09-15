@@ -1,0 +1,38 @@
+gdtr                          dw 0x0037
+                              dd 0x00002000
+;idtr                          dw ( _tdi - _idt - 0x01 )
+;                              dd 0x00003000                                     ;Page #0003, #0004
+
+string.YAOS                   db 'welcome to yaos! - '
+                              db 'yet another operating system v0.9.1.0',           0x0a, 0x00
+string.loadGDT                db 'load Global Descriptor Table (GDT)...',           0x0a, 0x00
+string.configInterrupts       db 'config Interrupts...',                            0x0a, 0x00
+string.usePaging              db 'use Paging...',                                   0x0a, 0x00
+string.initMultitasking       db 'initialize Multitasking...',                      0x0a, 0x00
+string.done                   db 'done.',                                           0x0a, 0x00
+string.Error                  db 'Error!',                                          0x0a, 0x00
+string.code                   db '[code]',                                          0x0a, 0x00
+string.data                   db '[data]',                                          0x0a, 0x00
+string.ThisIsAnException      db 'This is an Exception. Deal with it!',             0x0a, 0x00
+string.ThisIsAnIRQ            db 'This is an Interrupt Request. Deal with it!',     0x0a, 0x00
+string.ThisIsAnInterrupt      db 'This is an Interrupt. Deal with it!',             0x0a, 0x00
+string.ThisIsAnSpurious       db 'This is an Spurious Interrupt. Deal with it!',    0x0a, 0x00
+string.ThisIsAnKeyboard       db 'This is an Keyboard Interrupt. Deal with it!',    0x0a, 0x00
+string.CreateTask             db 'Create new Task...',                              0x0a, 0x00
+
+ata.x1.etc                    db 0
+ata.x2.etc                    db 0
+ata.x3.etc                    db 0
+ata.x4.etc                    db 0
+
+ata.hex                       db '01234567', 0x00
+
+process.current               db 0x00
+process.counter               db 0x00
+
+console.MemVideo              dd mem_Video
+console.PosVideo              dd mem_Video
+console.PosLine               db 0xa0
+console.TheLine               db 0x19
+
+;debug.base_kernel             dd base_Kernel

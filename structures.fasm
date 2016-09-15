@@ -1,0 +1,13 @@
+struc headerStream _driver, _flags
+{
+  .nextStream                 dd 0
+  .type
+  .flags                      dw _flags
+}
+struc headerModule _funcInit, _sizeCode, _sizeStck
+{
+  .magic                      db "yami"       ; yet another module-interface
+  .funcInit                   dd _funcInit    ; address in binary of initModule-function
+  .sizeCode                   dd _sizeCode    ; size in bytes of code-segment
+  .sizeStck                   dd _sizeStck    ; size in bytes of bss-segment
+}

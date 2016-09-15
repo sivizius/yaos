@@ -1,0 +1,11 @@
+struc elTorito
+{
+  .bri      db 0
+  .cd001    db 'CD001'
+  .version  db 0x01
+  .torito   db 'EL TORITO SPECIFICATION'
+            rb (0x40 - $ + .torito)
+  .catalog  dd 
+            rb 0x07c6
+  
+}

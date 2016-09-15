@@ -1,0 +1,214 @@
+struc TSS
+{
+  .PTL      dw 
+            dw 0x0000
+  .ESP0     dd 
+  .SS0      dw 
+            dw 0x0000
+  .ESP1     dd 
+  .SS1      dw 
+            dw 0x0000
+  .ESP2     dd 
+  .SS2      dw 
+            dw 0x0000
+  .CR3      dd 
+  .EIP      dd 
+  .EFLAGS   dd 
+  .EAX      dd 
+  .ECX      dd 
+  .EDX      dd 
+  .EBX      dd 
+  .ESP      dd 
+  .EBP      dd 
+  .ESI      dd 
+  .EDI      dd 
+  .ES       dw 
+            dw 0x0000
+  .CS       dw 
+            dw 0x0000
+  .SS       dw 
+            dw 0x0000
+  .DS       dw 
+            dw 0x0000
+  .FS       dw 
+            dw 0x0000
+  .GS       dw 
+            dw 0x0000
+  .LDTSS    dw 
+            dw 0x0000
+  .IOMBA    dw 0x0000
+            dw 
+}
+
+
+console.putChr: ; (char.w)
+  ;arg char
+    popw  ax
+  mov   ebx, [console.PosVideo]
+  xor   ecx, ecx
+  mov   cl, [console.PosLine]
+  ;if char == \n
+    cmp   al, 0x0a
+    jne   @f
+  ;then
+    ;if line != 160
+      cmp   cl, lenConsole
+      je    .final
+    ;then
+      add   ebx, ecx
+      mov   cl, lenConsole
+      jmp   .final
+    ;end
+  ;else
+    @@:
+    mov   [ebx], al
+    add   ebx, 0x02
+    sub   cl, 0x02
+    ;if ecx == 0
+      or    cl, cl
+      jnz   .final
+    ;then
+      ;ecx = 160
+      mov   cl, lenConsole
+    ;end
+  ;end
+  .final:
+  mov   [console.PosLine],  cl
+  mov   [console.PosVideo], ebx
+  ret
+  
+console.putStr: ; (*string)
+  ;arg *string
+    popd  esi
+  mov   edi, [console.PosVideo]
+  ;ebx = 0
+    xor   ebx, ebx
+  mov   bl, [console.PosLine]
+  ;do
+    .loop:
+    ;read char
+      lodsb
+    ;if char == \n
+      cmp   al, 0x0a
+      jne   @f
+    ;then
+      ;if line != 160
+        cmp   bl, lenConsole
+        je    .loop
+      ;then
+        add   edi, ebx
+        mov   bl, lenConsole
+        jmp   .loop
+      ;end
+    ;else
+      @@:
+      ;if char != \0
+        or   al, al
+        je   .final
+      ;then
+        ;if char != \\
+          cmp   al, '\'
+          je    @f
+        ;then
+          ;write char
+            stosb
+          inc   edi
+          sub   bl, 0x02
+          ;if line == 0
+            or    bl, bl
+            jne   .loop
+          ;then
+            mov   bl, lenConsole
+            jmp   .loop
+          ;end
+        ;else
+          @@:
+          ;read char
+            lodsb
+          ;select char
+            ;case 'n'
+              cmp   al, 'n'
+              jne   @f
+            ;case 'N'
+              cmp   al, 'N'
+              jne   @f
+            ;then
+              .caseN:
+              ;if line != 160
+                cmp   bl, lenConsole
+                je    .loop
+              ;then
+                add   edi, ebx
+                mov   bl, lenConsole
+                jmp   .loop
+              ;end
+            ;case '0'
+              @@:
+              cmp   al, '0'
+              jne   @f
+            ;then
+              jmp   .loop
+            ;else
+              @@:
+          ;end
+        ;end
+      ;end
+    ;end
+  ;loop until char == 0
+  .final:
+  mov   [console.PosLine],  bl
+  mov   [console.PosVideo], edi
+  ret
+console.putNum: ; (byte.l)
+  ;arg byte
+    popw  ax
+    xchg  al, ah
+    mov   esi, [console.PosVideo]
+    mov   dh,  [console.PosLine]
+    mov   dl,  
+    mov   bx, 0x8000
+    
+    mov   cx, 0x0006
+    console.binWord.loopAF:
+      test  ax, bx
+      je    @f
+        add   cx, ('a'-1)
+        mov   [esi], cl
+        sub   cx, ('a'-1)
+      @@:
+      add   esi, 0x02
+      sub   dh, 0x02
+      ;if dh == 0
+        or    dh, dh
+        jnz   @f
+      ;then
+        ;dh = 160
+          mov   dh, lenConsole
+      ;end
+      @@:
+      shr   bx, 1
+    loop  console.binWord.loopAF
+    mov   cx, 0x000a
+    console.binWord.loop09:
+      test  ax, bx
+      je   @f
+        add   cx, ('0'-1)
+        mov   [esi], cl
+        sub   cx, ('0'-1)
+      @@:
+      add   esi, 0x02
+      sub   dh, 0x02
+      ;if dh == 0
+        or    dh, dh
+        jnz   @f
+      ;then
+        ;dh = 160
+          mov   dh, lenConsole
+      ;end
+      @@:
+      shr   bx, 1
+    loop  console.binWord.loop09
+
+    mov   [console.PosLine],  dh
+    mov   [console.PosVideo], esi
+    ret

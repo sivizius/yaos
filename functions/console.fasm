@@ -1,0 +1,278 @@
+debug:
+.clear:
+  mov   dx, 0xa019                                              ;dl:dh = y:x
+  mov   edi, 0x000b8000
+  mov   al, 0x00
+  mov   ecx, 0x000007d0
+  @@:
+    stosb
+    inc   edi
+  loop @b
+  mov   edi, 0x000b8000
+  jmp   .return
+
+.value:
+  mov   dx, word [debug.y]                                      ;dl:dh = y:x
+  mov   edi, dword [debug.z]
+  call  .linefeed
+  popw  ax
+  popw  bx
+  xchg  al, ah
+  xchg  bl, bh
+  pushw ax
+  pushw bx
+  popw  bx
+  mov   al, bl
+  pushw bx
+  shr   al, 0x04
+  ;if al > 0x09
+    cmp   al, 0x09
+    jbe   @f
+  ;then
+    add  al, ( 'a' - 0x0a - '0')
+  ;else
+    @@:
+    add   al, '0'
+    ;put char
+      stosb
+      inc   edi
+  ;end
+  mov   al, bl
+  and   al, 0x0f
+  ;if al > 0x09
+    cmp   al, 0x09
+    jbe   @f
+  ;then
+    add  al, ( 'a' - 0x0a - '0')
+  ;else
+    @@:
+    add   al, '0'
+    ;put char
+      stosb
+      inc   edi
+  ;end
+  ;put char
+    mov   al, '.'
+    stosb
+    inc   edi
+  popw  bx
+  mov   al, bh
+  shr   al, 0x04
+  ;if al > 0x09
+    cmp   al, 0x09
+    jbe   @f
+  ;then
+    add  al, ( 'a' - 0x0a - '0')
+  ;else
+    @@:
+    add   al, '0'
+    ;put char
+      stosb
+      inc   edi
+  ;end
+  mov   al, bh
+  and   al, 0x0f
+  ;if al > 0x09
+    cmp   al, 0x09
+    jbe   @f
+  ;then
+    add  al, ( 'a' - 0x0a - '0')
+  ;else
+    @@:
+    add   al, '0'
+    ;put char
+      stosb
+      inc   edi
+  ;end
+  ;put char
+    mov   al, '.'
+    stosb
+    inc   edi
+  popw  bx
+  mov   al, bl
+  pushw bx
+  shr   al, 0x04
+  ;if al > 0x09
+    cmp   al, 0x09
+    jbe   @f
+  ;then
+    add  al, ( 'a' - 0x0a - '0')
+  ;else
+    @@:
+    add   al, '0'
+    ;put char
+      stosb
+      inc   edi
+  ;end
+  mov   al, bl
+  and   al, 0x0f
+  ;if al > 0x09
+    cmp   al, 0x09
+    jbe   @f
+  ;then
+    add  al, ( 'a' - 0x0a - '0')
+  ;else
+    @@:
+    add   al, '0'
+    ;put char
+      stosb
+      inc   edi
+  ;end
+  ;put char
+    mov   al, '.'
+    stosb
+    inc   edi
+  popw  bx
+  mov   al, bh
+  shr   al, 0x04
+  ;if al > 0x09
+    cmp   al, 0x09
+    jbe   @f
+  ;then
+    add  al, ( 'a' - 0x0a - '0')
+  ;else
+    @@:
+    add   al, '0'
+    ;put char
+      stosb
+      inc   edi
+  ;end
+  mov   al, bh
+  and   al, 0x0f
+  ;if al > 0x09
+    cmp   al, 0x09
+    jbe   @f
+  ;then
+    add  al, ('a' - 0x0a - '0')
+  ;else
+    @@:
+    add   al, '0'
+    ;put char
+      stosb
+      inc   edi
+  ;end
+  mov   dh, 0x8a
+  jmp   .return
+
+.char:
+  popw  ax
+  ;if char == \0
+    or   al, al
+    jnz  @f
+  ;then
+    ret
+  ;else
+    @@:
+    mov   dx, word [debug.y]                                    ;dl:dh = y:x
+    mov   edi, dword [debug.z]
+    ;if char == \n
+      cmp   al, 0x0a
+      jnz   @f
+    ;then
+      call  .linefeed
+      jmp   .return
+    ;else
+      @@:
+      ;if debug.x == 0
+        or    dh, dh
+        jnz   @f
+      ;then
+        pushw ax
+        call  .linefeed
+        popw  ax
+      ;end
+      @@:
+      ;put char
+        stosb
+        inc   edi
+      ;debug.x -= 2
+        sub   dh, 0x02
+    ;end
+    jmp   .return
+  ;end
+  ret
+
+.string:
+  mov   dx, word [debug.y]                                      ;dl:dh = y:x
+  mov   edi, dword [debug.z]
+  popd  esi
+  ;do
+    .string.loop:
+    ;read char
+      lodsb
+    ;if char == \n
+      cmp   al, 0x0a
+      jne   @f
+    ;then
+      call  .linefeed
+      jmp   .string.loop
+    ;else
+      @@:
+      ;if char != \0
+        or   al, al
+        je   .return
+      ;then
+        ;if debug.x == 0
+          or    dh, dh
+          jnz   @f
+        ;then
+          pushw ax
+          call  .linefeed
+          popw  ax
+        ;end
+        @@:
+        ;put char
+          stosb
+          inc   edi
+        ;debug.x -= 2
+          sub   dh, 0x02
+        jmp   .string.loop
+      ;end
+    ;end
+  ;loop until char == 0
+
+.return:
+  ;save debug.x, debug.y
+    mov   word [debug.y], dx
+  ;save debug.z
+    mov   dword [debug.z], edi
+  ret
+
+.linefeed:
+  ;debug.z += debug.x
+    xor   eax, eax
+    mov   al, dh
+    add   edi, eax
+    mov   dh, 0xa0
+  ;debug.y--
+    dec   dl
+  ;if debug.y == 0
+    or    dl, dl
+    jnz   @f
+  ;then
+    mov   dl, 0x01
+    pushd esi
+    pushd ecx
+    call  .scroll
+    popd  ecx
+    popd  esi
+  ;end
+  @@:
+  ret
+
+.scroll:
+  mov   ecx, 0x000003c0
+  mov   esi, 0x000b80a0
+  mov   edi, 0x000b8000
+  @@:
+    lodsd
+    stosd
+  loop @b
+  mov   al, 0x00
+  mov   ecx, 0x00000050
+  @@:
+    stosb
+    inc   edi
+  loop @b
+  mov   edi, 0x000b8f00
+  ret

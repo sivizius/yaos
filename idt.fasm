@@ -1,0 +1,72 @@
+_idt:
+  .Exceptions:
+  ;            newIDT           base,        selector,   active,     mode,                       type ;description
+  .x00:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x01:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x02:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x03:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x04:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x05:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x06:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x07:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x08:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x09:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x0a:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x0b:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x0c:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x0d:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x0e:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x0f:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x10:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x11:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x12:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x13:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x14:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x15:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x16:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x17:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x18:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x19:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x1a:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x1b:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x1c:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x1d:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x1e:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x1f:        newIDT       _int.x00, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .IRQs:
+  ;            newIDT           base,        selector,   active,     mode,                       type ;description
+  .x20:        newIDT       _int.x20, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;Programmable Interrupt Timer
+  .x21:        newIDT       _int.x21, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;Keyboard Interrupt
+  .x22:        newIDT       _int.x22, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x23:        newIDT       _int.x22, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x24:        newIDT       _int.x22, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x25:        newIDT       _int.x22, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x26:        newIDT       _int.x22, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x27:        newIDT       _int.x27, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x28:        newIDT       _int.x28, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x29:        newIDT       _int.x28, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x2a:        newIDT       _int.x28, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x2b:        newIDT       _int.x28, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x2c:        newIDT       _int.x28, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x2d:        newIDT       _int.x28, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x2e:        newIDT       _int.x28, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x2f:        newIDT       _int.x2f, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .SysCalls:
+  ;            newIDT           base,        selector,   active,     mode,                       type ;description
+  .x30:        newIDT       _int.x30, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;sys.page.new()
+  .x31:        newIDT       _int.x31, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;sys.page.del()
+  .x32:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;sys.process.start()
+  .x33:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;sys.process.stop()
+  .x34:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;sys.process.kill()
+  .x35:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x36:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x37:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x38:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x39:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x3a:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x3b:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x3c:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x3d:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x3e:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+  .x3f:        newIDT       _int.xff, _gdt.kernelCode, 'active', 'kernel',             idt_gInterrupt ;
+_tdi:

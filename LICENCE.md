@@ -1,4 +1,4 @@
-yaos. version 0.9.1.0-»Amanita muscaria«.
+yaos - yet another operating system. version 0.9.1.0-»Amanita muscaria«.
 
 Copyright (c) 2016, Sebastian Walz.
 
